@@ -97,7 +97,9 @@
         <div class="container-fulid">
             {% if caregiver %}
                  <a href="{% url 'care_point:next_contract' caregiver.id %}" > <button class="btn btn-primary btn-md">Przedluz umowe</button> </a>
-                 <a href="{% url 'care_point:new_worksheet_caregiver' caregiver.id %}" > <button class="btn btn-primary btn-md">Dodaj karte pracy</button> </a>
+{#                     TODO ogarnac metode dodawania z carevierem #}
+{#                 <a href="{% url 'care_point:worksheet_add' caregiver.id %}" > <button class="btn btn-primary btn-md">Dodaj karte pracy</button> </a>#}
+                 <a href="{% url 'care_point:worksheet_add' %}" > <button class="btn btn-primary btn-md">Dodaj karte pracy</button> </a>
              {% endif %}
         </div>
     </div>

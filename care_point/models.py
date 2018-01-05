@@ -60,7 +60,7 @@ class Address(models.Model):
     ward = models.ForeignKey(Ward, blank=True, null=True)
 
     def __str__(self):
-        return '{}, ul.  {}, {}, {}'.format(self.city, self.street, self.number, self.zip_code)
+        return '{}, ul.  {}, {}, kod pocztowy {}'.format(self.city, self.street, self.number, self.zip_code)
 
 
 class Illness(models.Model):
@@ -68,7 +68,7 @@ class Illness(models.Model):
     description = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.name
+        return '{}, {}'.format(self.name, self.description)
 
 
 class Activity(models.Model):

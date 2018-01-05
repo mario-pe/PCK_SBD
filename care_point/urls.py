@@ -5,7 +5,7 @@ app_name = 'care_point'
 
 urlpatterns = [
 
-    #index /competition
+    #index /carepoint
     url(r'^$', views.index, name='index'),
 
     #OPIEKINOWIE
@@ -37,7 +37,7 @@ urlpatterns = [
     # #DECYZJE
     url(r'^decision/$', views.decision, name='decision'),
     url(r'^decision/add/$', views.decision_add, name='decision_add'),
-    url(r'^decision/(?P<ward_id>[0-9]+)/$', views.next_decision, name='next_decision'),
+    url(r'^decision/(?P<ward_id>[0-9]+)/ward$', views.next_decision, name='next_decision'),
     url(r'^decision/(?P<decision_id>[0-9]+)/$', views.decision_details, name='decision_details'),
     url(r'^decision/(?P<decision_id>[0-9]+)/delete/$', views.decision_delete, name='decision_delete'),
     url(r'^decision/(?P<decision_id>[0-9]+)/update/$', views.decision_update, name='decision_update'),

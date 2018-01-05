@@ -86,6 +86,9 @@ def caregiver(request):
 def caregiver_add(request):
     if request.method == 'POST':
         form_caregiver = CaregiverForm(data=request.POST)
+
+        # form_contract.clean_data['data']  : dostep do pola formularza
+
         form_contract = ContractForm(data=request.POST)
 
         if form_caregiver.is_valid() and form_contract.is_valid():
@@ -94,7 +97,6 @@ def caregiver_add(request):
             if check_caregiver != None:
                 if caregiver.name == check_caregiver.name and caregiver.sname == check_caregiver.sname:
                     info = "Opiekun o tym imieniu i nazwisku znajduje sie w bazie."
-                    print(caregiver)
                     form_contract = ContractForm()
                     form_caregiver = CaregiverForm()
                     return render(request, 'care_point/caregiver/caregiver_add.html',
@@ -108,6 +110,8 @@ def caregiver_add(request):
     else:
         form_contract = ContractForm()
         form_caregiver = CaregiverForm()
+        # dodawanie wartosci do formularza
+        # from = searchTeeamForm({'name': " fc b "})
         return render(request, 'care_point/caregiver/caregiver_add.html',
                       {'form_caregiver': form_caregiver, 'form_contract': form_contract})
 
@@ -124,7 +128,6 @@ def caregiver_details(request, caregiver_id):
     calendar += '<table id="calendar"><tbody>'
     for i in range(0, 5):
         if iterator % 7 == 1:
-            print("pierwszy if: " + iterator.__str__())
             calendar += '<tr class="calendar_tr">'
         for j in range(0, 7):
             for w in worksheet:
@@ -135,7 +138,7 @@ def caregiver_details(request, caregiver_id):
                         calendar += '<td class="calendar_td">' + iterator.__str__() + '<br>'
                         for w_for_day in worksheet:
                             if w_for_day.date.day == iterator:
-                                calendar += '<a href="' + '/care_point/worksheet/'+ w.id.__str__() + '/'  '"> ' + w.ward.__str__() +'</a><br>'
+                                calendar += '<a href="' + '/care_point/worksheet/'+ w_for_day.id.__str__() + '/'  '"> ' + w_for_day.ward.__str__() +'</a><br>'
                         iterator += 1
                         calendar += '</td>'
                         if iterator % 7 == 1:
@@ -259,6 +262,7 @@ def ward_add(request):
     if request.method == 'POST':
         form_ward = WardForm(data=request.POST)
         form_decision = DecisionForm(data=request.POST)
+        form_address = AddressForm(data=request.POST)
         if form_ward.is_valid() and form_decision.is_valid():
             ward = form_ward.save(commit=False)
             check_ward = Ward.objects.filter(name=ward.name).filter(sname=ward.sname).filter(pesel=ward.pesel).first()
@@ -272,14 +276,28 @@ def ward_add(request):
                                   {'form_ward': form_ward, 'form_decision': form_decision, 'info': info})
             else:
                 decision = form_decision.save(commit=False)
+                address = form_address.save(commit=False)
                 ward.save()
                 decision.save()
+                address.save()
                 ward.decision_set.add(decision)
+                ward.address_set.add(address)
+                ill = form_decision.cleaned_data['illness']
+                act = form_decision.cleaned_data['activity']
+
+                for i in ill:
+                    decision.illness.add(i)
+                for a in act:
+                    decision.activity.add(a)
+
+
         return redirect('care_point:ward')
     else:
         form_ward = WardForm()
         form_decision = DecisionForm()
-        return render(request, 'care_point/ward/ward_add.html', {'form_ward': form_ward, 'form_decision': form_decision})
+        form_address = AddressForm()
+        return render(request, 'care_point/ward/ward_add.html', {'form_ward': form_ward, 'form_decision': form_decision, 'form_address': form_address})
+
 
 def ward_details(request, ward_id):
     ward = get_object_or_404(Ward, pk=ward_id)
@@ -361,6 +379,12 @@ def decision_add(request):
         if form.is_valid():
             new = form.save(commit=False)
             new.save()
+            ill = form.cleaned_data['illness']
+            act = form.cleaned_data['activity']
+            for i in ill:
+                new.illness.add(i)
+            for a in act:
+                new.activity.add(a)
         return redirect('care_point:decision')
     else:
         form = DecisionForm()
@@ -416,12 +440,16 @@ def worksheet_add(request):
 
             caregiver_worksheet_at_date = Worksheet.objects.filter(caregiver=new.caregiver).filter(date=new.date)
             ward_worksheet_at_date = Worksheet.objects.filter(ward=new.ward).filter(date=new.date)
-            list(caregiver_worksheet_at_date)
+
+            check_caregiver = check_available(caregiver_worksheet_at_date, new)
+            check_ward = check_available(ward_worksheet_at_date, new)
+
+            # list(caregiver_worksheet_at_date)
             # list(ward_worksheet_at_date)
 
-            new_time_from = idt.datetime.combine(idt.date(1, 1, 1), new.hour_from)
-            new_time_to = idt.datetime.combine(idt.date(1, 1, 1), new.hour_to)
-            compare_time = idt.timedelta(0, 0, 0)
+            # new_time_from = idt.datetime.combine(idt.date(1, 1, 1), new.hour_from)
+            # new_time_to = idt.datetime.combine(idt.date(1, 1, 1), new.hour_to)
+            # compare_time = idt.timedelta(0, 0, 0)
 
             # Checking available of cargiver
 
@@ -429,40 +457,44 @@ def worksheet_add(request):
 
             # ZAMKNAC W METODE I UOGOLNIC
 
-            if len(caregiver_worksheet_at_date) > 0:
-                is_free = True
-                for i in caregiver_worksheet_at_date:
-                    i_time_from = idt.datetime.combine(idt.date(1, 1, 1), i.hour_from)
-                    i_time_to = idt.datetime.combine(idt.date(1, 1, 1), i.hour_to)
+            # if len(caregiver_worksheet_at_date) > 0:
+            #     is_free = True
+            #     for i in caregiver_worksheet_at_date:
+            #         i_time_from = idt.datetime.combine(idt.date(1, 1, 1), i.hour_from)
+            #         i_time_to = idt.datetime.combine(idt.date(1, 1, 1), i.hour_to)
+            #
+            #         if i_time_from - new_time_from < compare_time:
+            #
+            #             if i_time_to - new_time_from > compare_time or i_time_to - new_time_to > compare_time:
+            #                 is_free = False
+            #
+            #         elif i_time_from - new_time_from > compare_time:
+            #
+            #             if i_time_from - new_time_to < compare_time or i_time_to - new_time_to < compare_time:
+            #                 is_free = False
+            #
+            #         elif new_time_from - new_time_to >= compare_time:
+            #             info = "Godzina rozpoczecia opieki " + new.hour_from.__str__() + " musi byc wczesniejsza niz godzina zakonczenia " + new.hour_to.__str__() + "."
+            #             form = WorksheetForm()
+            #             return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form, "info": info})
+            #
+            #         else:
+            #             is_free = False
 
-                    if i_time_from - new_time_from < compare_time:
-
-                        if i_time_to - new_time_from > compare_time or i_time_to - new_time_to > compare_time:
-                            is_free = False
-
-                    elif i_time_from - new_time_from > compare_time:
-
-                        if i_time_from - new_time_to < compare_time or i_time_to - new_time_to < compare_time:
-                            is_free = False
-
-                    elif new_time_from - new_time_to >= compare_time:
-                        info = "Godzina rozpoczecia opieki " + new.hour_from.__str__() + " musi byc wczesniejsza niz godzina zakonczenia " + new.hour_to.__str__() + "."
-                        form = WorksheetForm()
-                        return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form, "info": info})
-
-                    else:
-                        is_free = False
-
-                if is_free:
-                    new.save()
-                    return redirect('care_point:worksheet')
-                else:
-                    info = "W godzinach " + new.hour_from.__str__() + " - " + new.hour_to.__str__() + " pracownik " + new.caregiver.__str__() + " wykonuje inne obowiazki"
-                    form = WorksheetForm()
-                    return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form, "info": info})
-            else:
+            if check_caregiver and check_ward:
                 new.save()
                 return redirect('care_point:worksheet')
+            elif not check_caregiver:
+                info = "W godzinach " + new.hour_from.__str__() + " - " + new.hour_to.__str__() + " pracownik " + new.caregiver.__str__() + " wykonuje inne obowiazki"
+                form = worksheet_form_with_content(new)
+                return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form, "info": info})
+            elif not check_ward:
+                info = "W godzinach " + new.hour_from.__str__() + " - " + new.hour_to.__str__() + " podopieczny " + new.ward.__str__() + " ma inna wizyte"
+                form = worksheet_form_with_content(new)
+                return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form, "info": info})
+            # else:
+            #     new.save()
+            #     return redirect('care_point:worksheet')
     else:
         form = WorksheetForm()
         return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form})
@@ -470,7 +502,21 @@ def worksheet_add(request):
 
 def worksheet_details(request, worksheet_id):
     worksheet = get_object_or_404(Worksheet, pk=worksheet_id)
-    return render(request, 'care_point/worksheet/worksheet_details.html', {'worksheet': worksheet})
+
+    ward = Ward.objects.filter(pk=worksheet.ward_id).first()
+    address = list(Address.objects.filter(ward=ward).all())
+    ward_decisions =ward.decision_set.all()
+
+    ward_activity = []
+    ward_illness = []
+    for decision in ward_decisions:
+        wl = list(decision.illness.all())
+        wa = list(decision.activity.all())
+        ward_illness = set(ward_illness + wl)
+        ward_activity = set(ward_activity + wa)
+        ward_illness = list(ward_illness)
+        ward_activity = list(ward_activity)
+    return render(request, 'care_point/worksheet/worksheet_details.html', {'worksheet': worksheet, 'ward_illness': ward_illness, 'ward_activity': ward_activity, 'address': address})
 
 
 def worksheet_update(request, worksheet_id):
@@ -518,12 +564,12 @@ def new_worksheet_ward(request, ward_id):
         return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form})
 
 
-def check_available(request, worksheets, new_worksheet, person, form):
+def check_available(worksheets, new_worksheet):
     new_time_from = idt.datetime.combine(idt.date(1, 1, 1), new_worksheet.hour_from)
     new_time_to = idt.datetime.combine(idt.date(1, 1, 1), new_worksheet.hour_to)
     compare_time = idt.timedelta(0, 0, 0)
+    is_free = True
     if len(worksheets) > 0:
-        is_free = True
         for i in worksheets:
             i_time_from = idt.datetime.combine(idt.date(1, 1, 1), i.hour_from)
             i_time_to = idt.datetime.combine(idt.date(1, 1, 1), i.hour_to)
@@ -539,17 +585,23 @@ def check_available(request, worksheets, new_worksheet, person, form):
                     is_free = False
 
             elif new_time_from - new_time_to >= compare_time:
-                info = "Godzina rozpoczecia opieki " + new_worksheet.hour_from.__str__() + " musi byc wczesniejsza niz godzina zakonczenia " + new_worksheet.hour_to.__str__() + "."
-                form = WorksheetForm()
-                return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form, "info": info})
+                is_free = False
 
             else:
                 is_free = False
 
-        if is_free:
-            new_worksheet.save()
-            return redirect('care_point:worksheet')
-        else:
-            info = "W godzinach " + new_worksheet.hour_from.__str__() + " - " + new_worksheet.hour_to.__str__() + " pracownik " + new_worksheet.caregiver.__str__() + " wykonuje inne obowiazki"
-            form = WorksheetForm()
-            return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form, "info": info})
+    return is_free
+
+
+def worksheet_form_with_content(data):
+    form = WorksheetForm({
+        'caregiver': data.caregiver,
+        'ward': data.ward,
+        'decision': data.decision,
+        'genre': data.genre,
+        'date': data.date,
+        'hour_from': data.hour_from,
+        'hour_to': data.hour_to,
+        'description': data.description})
+    return form
+

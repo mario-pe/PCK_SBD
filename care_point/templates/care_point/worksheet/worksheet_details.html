@@ -3,16 +3,111 @@
 {% block body %}
 
     <div class="col-ms-12 col-md-6">
-        <div class="container-fluid">
-             <div class="details-container">
-                {% if worksheet %}
-                    {{ worksheet }}
-                {% else %}
-                    <h2>No worksheet to display</h2>
-                {% endif %}
+        <div class="row">
+        <div class="col-ms-12 col-md-12">
+            <div class="container-fluid">
+                 <div class="details-container">
+                    {% if worksheet %}
+                        <table>
+                            <tr>
+                                <td>Opiekun: </td>
+                                <td>{{ worksheet.caregiver.name }} {{ worksheet.caregiver.sname }}</td>
+                            </tr>
+                            <tr>
+                                <td>Podopieczny: </td>
+                                <td>{{ worksheet.ward.name }} {{ worksheet.ward.sname }}</td>
+                            </tr>
+                            <tr>
+                                <td>Data </td>
+                                <td>{{ worksheet.date }}</td>
+                            </tr>
+                            <tr>
+                                <td>Godzina od </td>
+                                <td>{{ worksheet.hour_from }}</td>
+                            </tr>
+                            <tr>
+                                <td>Godzina do </td>
+                                <td>{{ worksheet.hour_to }}</td>
+                            </tr>
+                        </table>
+                    {% else %}
+                        <h2>No worksheet to display</h2>
+                    {% endif %}
+                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-ms-12 col-md-12">
+                 <div class="container-fluid">
+                    {% if address %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Adres</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in address %}
+                                    <tr class="object_display">
+                                        <td><a href=" {%  url "care_point:address_details" a.id %}"> {{ a }} <br> </a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {%  else %}
+                        <p> Niema informacji o adresach. </p>
+                    {% endif %}
+                 </div>
+             </div>
+        </div>
+        <div class="row">
+            <div class="col-ms-12 col-md-12">
+                 <div class="container-fluid">
+                    {% if ward_illness %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Choroby</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for illness in ward_illness %}
+                                    <tr class="object_display">
+                                        <td><a href=" {%  url "care_point:illness_details" illness.id %}"> {{ illness }} <br> </a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {%  else %}
+                        <p> Niema informacji o chorobach. </p>
+                    {% endif %}
+                 </div>
+             </div>
+        </div>
+        <div class="row">
+            <div class="col-ms-12 col-md-12">
+                 <div class="container-fluid">
+                    {% if ward_activity %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Aktywnosci</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in ward_activity %}
+                                    <tr class="object_display">
+                                        <td><a href=" {%  url "care_point:activity_details" activity.id %}"> {{ activity }} <br> </a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {%  else %}
+                        <p> Niema informacji o aktywnosciach. </p>
+                    {% endif %}
+                 </div>
              </div>
         </div>
     </div>
-
-
+    </div>
 {% endblock %}
