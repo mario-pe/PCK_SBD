@@ -84,8 +84,8 @@ class Decision(models.Model):
     hours = models.CharField(max_length=4)
     charge = models.CharField(max_length=30)
     ward = models.ForeignKey(Ward, blank=True, null=True)
-    illness = models.ManyToManyField(Illness, blank=True, null=True)
-    activity = models.ManyToManyField(Activity, blank=True, null=True)
+    illness = models.ManyToManyField(Illness, blank=True)
+    activity = models.ManyToManyField(Activity, blank=True)
 
     def __str__(self):
         return 'Doplata w {}%, godziny {}, stawka {}, podopieczny {}'.format(self.percent_payment, self.hours, self.charge, self.ward)

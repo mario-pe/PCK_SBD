@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response
 from datetime import datetime as fdt
 import datetime as idt
@@ -11,11 +12,13 @@ def index(request):
 
 
 #CONTRACT
+@login_required
 def contract(request):
     contracts = Contract.objects.all()
     return render(request, 'care_point/contract/contract.html', {'contracts': contracts})
 
 
+@login_required
 def contract_update(request, contract_id):
     c = get_object_or_404(Contract, pk=contract_id)
     form = ContractForm(data=request.POST or None, instance=c)
@@ -27,17 +30,20 @@ def contract_update(request, contract_id):
     return render(request, 'care_point/contract/contract_update.html', {'form': form})
 
 
+@login_required
 def contract_details(request, contract_id):
     contract = get_object_or_404(Contract, pk=contract_id)
     return render(request, 'care_point/contract/contract_details.html', {'contract': contract})
 
 
+@login_required
 def contract_delete(request, contract_id):
     contract = get_object_or_404(Contract, pk=contract_id)
     contract.delete()
     return redirect('care_point:contract')
 
 
+@login_required
 def contract_add(request):
     if request.method == 'POST':
         form = ContractForm(data=request.POST)
@@ -50,6 +56,7 @@ def contract_add(request):
         return render(request, 'care_point/contract/contract_add.html', {'form': form})
 
 
+@login_required
 def contract_add_caregiver(request):
     if request.method == 'POST':
         form = ContractForm(data=request.POST)
@@ -63,6 +70,7 @@ def contract_add_caregiver(request):
         return render(request, 'care_point/contract/contract_add.html', {'form': form})
 
 
+@login_required
 def next_contract(request, caregiver_id):
     if request.method == 'POST':
         form = ContractForm(data=request.POST)
@@ -78,11 +86,13 @@ def next_contract(request, caregiver_id):
 
 
 #CAREGIVER
+@login_required
 def caregiver(request):
     c = Caregiver.objects.all()
     return render(request, 'care_point/caregiver/caregiver.html', {'caregivers': c})
 
 
+@login_required
 def caregiver_add(request):
     if request.method == 'POST':
         form_caregiver = CaregiverForm(data=request.POST)
@@ -116,6 +126,7 @@ def caregiver_add(request):
                       {'form_caregiver': form_caregiver, 'form_contract': form_contract})
 
 
+@login_required
 def caregiver_details(request, caregiver_id):
     caregiver = get_object_or_404(Caregiver, pk=caregiver_id)
     contract = caregiver.contract_set.all()
@@ -156,6 +167,7 @@ def caregiver_details(request, caregiver_id):
                   {'caregiver': caregiver, 'contract': contract, 'worksheet': worksheet, 'calendar': calendar})
 
 
+@login_required
 def caregiver_update(request, caregiver_id):
     c = get_object_or_404(Caregiver, pk=caregiver_id)
     form = CaregiverForm(data=request.POST or None, instance=c)
@@ -167,17 +179,20 @@ def caregiver_update(request, caregiver_id):
     return render(request, 'care_point/caregiver/caregiver_update.html', {'form': form})
 
 
+@login_required
 def caregiver_delete(request, caregiver_id):
     caregiver = get_object_or_404(Caregiver, pk=caregiver_id)
     caregiver.delete()
     return redirect('care_point:caregiver')
 
 
+@login_required
 def illness(request):
     illness = Illness.objects.all()
     return render(request, 'care_point/illness/illness.html', {'illness': illness})
 
 
+@login_required
 def illness_add(request):
     if request.method == 'POST':
         form = IllnessForm(data=request.POST)
@@ -190,11 +205,13 @@ def illness_add(request):
         return render(request, 'care_point/illness/illness_add.html', {'form': form})
 
 
+@login_required
 def illness_details(request, illness_id):
     illness = get_object_or_404(Illness, pk=illness_id)
     return render(request, 'care_point/illness/illness_details.html', {'illness': illness})
 
 
+@login_required
 def illness_update(request, illness_id):
     i = get_object_or_404(Illness, pk=illness_id)
     form = IllnessForm(data=request.POST or None, instance=i)
@@ -206,17 +223,21 @@ def illness_update(request, illness_id):
     return render(request, 'care_point/illness/illness_update.html', {'form': form})
 
 
+@login_required
 def illness_delete(request, illness_id):
     illness = get_object_or_404(Illness, pk=illness_id)
     illness.delete()
     return redirect('care_point:illness')
 
 
+@login_required
 def activity(request):
     activity = Activity.objects.all()
     return render(request, 'care_point/activity/activity.html', {'activity': activity})
 
+
 # ACTIVITY
+@login_required
 def activity_add(request):
     if request.method == 'POST':
         form = ActivityForm(data=request.POST)
@@ -229,11 +250,13 @@ def activity_add(request):
         return render(request, 'care_point/activity/activity_add.html', {'form': form})
 
 
+@login_required
 def activity_details(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
     return render(request, 'care_point/activity/activity_details.html', {'activity': activity})
 
 
+@login_required
 def activity_update(request, activity_id):
 
     a = get_object_or_404(Activity, pk=activity_id)
@@ -246,6 +269,7 @@ def activity_update(request, activity_id):
     return render(request, 'care_point/activity/activity_update.html', {'form': form})
 
 
+@login_required
 def activity_delete(request, activity_id):
     activity = get_object_or_404(Activity, pk=activity_id)
     activity.delete()
@@ -253,11 +277,13 @@ def activity_delete(request, activity_id):
 
 
 #WARD
+@login_required
 def ward(request):
     ward = Ward.objects.all()
     return render(request, 'care_point/ward/ward.html', {'ward': ward})
 
 
+@login_required
 def ward_add(request):
     if request.method == 'POST':
         form_ward = WardForm(data=request.POST)
@@ -284,13 +310,10 @@ def ward_add(request):
                 ward.address_set.add(address)
                 ill = form_decision.cleaned_data['illness']
                 act = form_decision.cleaned_data['activity']
-
                 for i in ill:
                     decision.illness.add(i)
                 for a in act:
                     decision.activity.add(a)
-
-
         return redirect('care_point:ward')
     else:
         form_ward = WardForm()
@@ -299,6 +322,7 @@ def ward_add(request):
         return render(request, 'care_point/ward/ward_add.html', {'form_ward': form_ward, 'form_decision': form_decision, 'form_address': form_address})
 
 
+@login_required
 def ward_details(request, ward_id):
     ward = get_object_or_404(Ward, pk=ward_id)
     decision = ward.decision_set.all()
@@ -306,6 +330,7 @@ def ward_details(request, ward_id):
     return render(request, 'care_point/ward/ward_details.html', {'ward': ward, 'decision': decision, 'worksheet':worksheet })
 
 
+@login_required
 def ward_update(request, ward_id):
 
     w = get_object_or_404(Ward, pk=ward_id)
@@ -318,6 +343,7 @@ def ward_update(request, ward_id):
     return render(request, 'care_point/ward/ward_update.html', {'form': form})
 
 
+@login_required
 def ward_delete(request, ward_id):
     ward = get_object_or_404(Ward, pk=ward_id)
     ward.delete()
@@ -325,11 +351,13 @@ def ward_delete(request, ward_id):
 
 
 # ADDRESS
+@login_required
 def address(request):
     address = Address.objects.all()
     return render(request, 'care_point/address/address.html', {'address': address})
 
 
+@login_required
 def address_add(request):
     if request.method == 'POST':
         form = AddressForm(data=request.POST)
@@ -344,11 +372,13 @@ def address_add(request):
         return render(request, 'care_point/address/address_add.html', {'form': form})
 
 
+@login_required
 def address_details(request, address_id):
     address = get_object_or_404(Address, pk=address_id)
     return render(request, 'care_point/address/address_details.html', {'address': address})
 
 
+@login_required
 def address_update(request, address_id):
 
     a = get_object_or_404(Address, pk=address_id)
@@ -361,6 +391,7 @@ def address_update(request, address_id):
     return render(request, 'care_point/address/address_update.html', {'form': form})
 
 
+@login_required
 def address_delete(request, address_id):
     address = get_object_or_404(Address, pk=address_id)
     address.delete()
@@ -368,11 +399,13 @@ def address_delete(request, address_id):
 
 
 # DECISION
+@login_required
 def decision(request):
     decision = Decision.objects.all()
     return render(request, 'care_point/decision/decision.html', {'decision': decision})
 
 
+@login_required
 def decision_add(request):
     if request.method == 'POST':
         form = DecisionForm(data=request.POST)
@@ -391,11 +424,13 @@ def decision_add(request):
         return render(request, 'care_point/decision/decision_add.html', {'form': form})
 
 
+@login_required
 def decision_details(request, decision_id):
     decision = get_object_or_404(Decision, pk=decision_id)
     return render(request, 'care_point/decision/decision_details.html', {'decision': decision})
 
 
+@login_required
 def decision_update(request, decision_id):
 
     d = get_object_or_404(Decision, pk=decision_id)
@@ -408,12 +443,14 @@ def decision_update(request, decision_id):
     return render(request, 'care_point/decision/decision_update.html', {'form': form})
 
 
+@login_required
 def decision_delete(request, decision_id):
     decision = get_object_or_404(Decision, pk=decision_id)
     decision.delete()
     return redirect('care_point:decision')
 
 
+@login_required
 def next_decision(request, ward_id):
     if request.method == 'POST':
         form = DecisionForm(data=request.POST)
@@ -427,11 +464,13 @@ def next_decision(request, ward_id):
 
 
 #WORKSHEET
+@login_required
 def worksheet(request):
     worksheet = Worksheet.objects.all()
     return render(request, 'care_point/worksheet/worksheet.html', {'worksheet': worksheet})
 
 
+@login_required
 def worksheet_add(request):
     if request.method == 'POST':
         form = WorksheetForm(data=request.POST)
@@ -500,6 +539,7 @@ def worksheet_add(request):
         return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form})
 
 
+@login_required
 def worksheet_details(request, worksheet_id):
     worksheet = get_object_or_404(Worksheet, pk=worksheet_id)
 
@@ -519,6 +559,7 @@ def worksheet_details(request, worksheet_id):
     return render(request, 'care_point/worksheet/worksheet_details.html', {'worksheet': worksheet, 'ward_illness': ward_illness, 'ward_activity': ward_activity, 'address': address})
 
 
+@login_required
 def worksheet_update(request, worksheet_id):
 
     w = get_object_or_404(Worksheet, pk=worksheet_id)
@@ -531,12 +572,14 @@ def worksheet_update(request, worksheet_id):
     return render(request, 'care_point/worksheet/worksheet_update.html', {'form': form})
 
 
+@login_required
 def worksheet_delete(request, worksheet_id):
     worksheet = get_object_or_404(Worksheet, pk=worksheet_id)
     worksheet.delete()
     return redirect('care_point:worksheet')
 
 
+@login_required
 def new_worksheet_caregiver(request, caregiver_id):
     if request.method == 'POST':
         form = WorksheetForm(data=request.POST)
@@ -551,6 +594,7 @@ def new_worksheet_caregiver(request, caregiver_id):
         return render(request, 'care_point/worksheet/worksheet_add.html', {'form': form})
 
 
+@login_required
 def new_worksheet_ward(request, ward_id):
     if request.method == 'POST':
         form = WorksheetForm(data=request.POST)
